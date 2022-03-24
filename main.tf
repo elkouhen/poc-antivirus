@@ -1,7 +1,7 @@
 locals {
   bucket_name = "s3-clamav-123457"
   lambda_name = "lambda-clamav"
-  image_uri   = "629923658207.dkr.ecr.eu-west-1.amazonaws.com/clamav:1.0"
+  image_uri   = "629923658207.dkr.ecr.eu-west-1.amazonaws.com/clamav:1.1"
 }
 
 resource "aws_kms_key" "bucket_kms" {

@@ -40,7 +40,7 @@ module.exports.virusScan = async (event, context) => {
 
       execSync(`./bin/clamscan -v --database=./var/lib/clamav /tmp/${record.s3.object.key}`);
 
-      console.log("Tag the file");
+      console.log("Tag Clean File");
 
       await s3
         .putObjectTagging({
@@ -58,7 +58,7 @@ module.exports.virusScan = async (event, context) => {
         .promise();
     } catch (err) {
 
-      console.log("Caught Error");
+      console.log("Tag Dirty File");
 
       if (err.status === 1) {
         // tag as dirty, OR you can delete it
