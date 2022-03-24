@@ -1,3 +1,9 @@
+locals {
+  bucket_name = "s3-clamav-123457"
+  lambda_name = "lambda-clamav"
+  image_uri   = "629923658207.dkr.ecr.eu-west-1.amazonaws.com/clamav:1.0"
+}
+
 resource "aws_kms_key" "bucket_kms" {
   description             = "bucket_kms"
   deletion_window_in_days = 10
@@ -16,8 +22,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "bucket" {
 }
 
 resource "aws_s3_bucket" "bucket" {
-  bucket = "clamav-bucket-123457"
-
+  bucket = local.bucket_name
 }
 
 resource "aws_lambda_permission" "allow_bucket" {
@@ -47,38 +52,29 @@ module "lambda" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "2.35.1"
 
-  function_name  = "clamav-lambda"
+  function_name  = local.lambda_name
   description    = "Clamav Lambda"
   create_package = false
 
-  image_uri    = "629923658207.dkr.ecr.eu-west-1.amazonaws.com/clamav:1.0"
+  image_uri    = local.image_uri
   package_type = "Image"
   timeout      = 120
   memory_size  = 2048
 
-  attach_policy_json = true
-  policy_json        = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "s3:GetObject", "s3:PutObjectTagging"
-            ],
-            "Resource": ["arn:aws:s3:::clamav-bucket-123457/*"]
-        }, 
-        {
-            "Effect": "Allow",
-            "Action": [
-                "kms:*"
-            ],
-            "Resource": ["*"]
-        }        
-    ]
-}
-EOF
-
+  attach_policy_statements = true
+  policy_statements        = {
+    s3_read = {
+      effect    = "Allow",
+      actions   = ["s3:HeadObject", "s3:GetObject", "s3:PutObjectTagging"],
+      resources = ["arn:aws:s3:::${aws_s3_bucket.bucket.bucket}/*"]
+    }, 
+    kms_read = {
+      effect    = "Allow",
+      actions   = ["kms:*"],
+      resources = [aws_kms_key.bucket_kms.arn]
+    }
+  }
+  
   environment_variables = {
     Serverless = "Terraform"
   }

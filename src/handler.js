@@ -60,23 +60,23 @@ module.exports.virusScan = async (event, context) => {
 
       console.log("Caught Error");
 
-      // XXX if (err.status === 1) {
-      // tag as dirty, OR you can delete it
-      await s3
-        .putObjectTagging({
-          Bucket: record.s3.bucket.name,
-          Key: record.s3.object.key,
-          Tagging: {
-            TagSet: [
-              {
-                Key: 'av-status',
-                Value: 'dirty'
-              }
-            ]
-          }
-        })
-        .promise();
-      // XXX }
+      if (err.status === 1) {
+        // tag as dirty, OR you can delete it
+        await s3
+          .putObjectTagging({
+            Bucket: record.s3.bucket.name,
+            Key: record.s3.object.key,
+            Tagging: {
+              TagSet: [
+                {
+                  Key: 'av-status',
+                  Value: 'dirty'
+                }
+              ]
+            }
+          })
+          .promise();
+      }
     }
 
     // delete the temp file
