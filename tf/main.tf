@@ -1,7 +1,8 @@
 locals {
-  bucket_name = "s3-clamav-123458"
-  lambda_name = "lambda-clamav"
-  image_uri   = "629923658207.dkr.ecr.eu-west-1.amazonaws.com/clamav:1.1"
+  bucket_name           = "s3-clamav-123458"
+  lambda_name           = "lambda-clamav"
+  presigned_lambda_name = "lambda-presigned"
+  image_uri             = "629923658207.dkr.ecr.eu-west-1.amazonaws.com/clamav:1.1"
 }
 
 resource "aws_kms_key" "clamav_bucket_key" {
@@ -30,7 +31,7 @@ resource "aws_lambda_permission" "allow_bucket" {
   statement_id = "AllowExecutionFromS3Bucket"
 
   action        = "lambda:InvokeFunction"
-  function_name = module.lambda.lambda_function_arn
+  function_name = module.clamav_lambda.lambda_function_arn
   principal     = "s3.amazonaws.com"
   source_arn    = aws_s3_bucket.clamav_bucket.arn
 }
@@ -40,7 +41,7 @@ resource "aws_s3_bucket_notification" "clamav_bucket_notification" {
 
 
   lambda_function {
-    lambda_function_arn = module.lambda.lambda_function_arn
+    lambda_function_arn = module.clamav_lambda.lambda_function_arn
     events              = ["s3:ObjectCreated:*"]
   }
 
@@ -50,7 +51,7 @@ resource "aws_s3_bucket_notification" "clamav_bucket_notification" {
 
 module "clamav_lambda" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "2.35.1"
+  version = "3.1.0"
 
   function_name  = local.lambda_name
   description    = "Clamav Lambda"
@@ -62,19 +63,19 @@ module "clamav_lambda" {
   memory_size  = 2048
 
   attach_policy_statements = true
-  policy_statements        = {
+  policy_statements = {
     s3_read = {
       effect    = "Allow",
       actions   = ["s3:HeadObject", "s3:GetObject", "s3:PutObjectTagging"],
       resources = ["arn:aws:s3:::${aws_s3_bucket.clamav_bucket.bucket}/*"]
-    }, 
+    },
     kms_read = {
       effect    = "Allow",
       actions   = ["kms:*"],
       resources = [aws_kms_key.clamav_bucket_key.arn]
     }
   }
-  
+
   environment_variables = {
     Serverless = "Terraform"
   }
