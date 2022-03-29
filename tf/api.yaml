@@ -1,0 +1,62 @@
+openapi: "3.0.1"
+info:
+  version: "1"
+  title: "Presigned URL API documentation"
+
+
+servers:
+  - url: "https://{api_id}.execute-api.eu-west-3.amazonaws.com/live"
+    variables:
+      api_id:
+        default: api_id
+        description: set api id
+
+paths:
+
+  /presigned-url:
+    post:
+      summary: "Create a presigned URL"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PresignedURL"
+      responses:
+        201:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PresignedURL"
+      security:
+        - sigv4: [ ]
+#      x-amazon-apigateway-request-validator: validate_request
+#      x-amazon-apigateway-integration:
+#        responses:
+#          default:
+#            statusCode: 201
+#        uri:
+#          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PresignedUrlLambda.Arn}/invocations"
+#        passthroughBehavior: when_no_match
+#        httpMethod: POST
+#        type: aws_proxy
+
+components:
+  schemas:
+    PresignedURL:
+      type: object
+      properties:
+        language:
+          type: string
+
+securityDefinitions:
+  sigv4:
+    type: apiKey
+    name: Authorization
+    in: header
+    x-amazon-apigateway-authtype: awsSigv4
+
+x-amazon-apigateway-request-validators:
+  validate_request:
+    validateRequestBody: true
+    validateRequestParameters: true
