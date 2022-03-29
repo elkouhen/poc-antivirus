@@ -72,6 +72,6 @@ FROM public.ecr.aws/lambda/nodejs:14
 
 COPY --from=layer-image /home/build ./
 
-COPY src/handler.js ./
+COPY src/clamav/handler.js ./
 
 CMD ["handler.virusScan"]
