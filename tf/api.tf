@@ -1,9 +1,10 @@
 resource "aws_api_gateway_rest_api" "api" {
+
   body = templatefile("api.yaml", {
     presignedurl_lambda_arn = module.presignedurl_lambda.lambda_function_arn
   })
 
-  name = "presigned url"
+  name           = "presigned url"
   api_key_source = "HEADER"
 
   endpoint_configuration {
@@ -27,6 +28,7 @@ resource "aws_api_gateway_stage" "live" {
   deployment_id = aws_api_gateway_deployment.deploy.id
   rest_api_id   = aws_api_gateway_rest_api.api.id
   stage_name    = "live"
+
 }
 
 resource "aws_api_gateway_usage_plan" "api_usageplan" {
@@ -57,12 +59,19 @@ module "presignedurl_lambda" {
   handler       = "handler.presigned"
   runtime       = "python3.9"
   source_path   = "../src/presigned-url"
+  publish       = true
+  timeout       = 120
+  memory_size   = 2048
 
-  timeout     = 120
-  memory_size = 2048
-
+  allowed_triggers = {
+    APIGatewayAny = {
+      service    = "apigateway"
+      source_arn = "${aws_api_gateway_rest_api.api.execution_arn}/*/*/*"
+    }
+  }
   environment_variables = {
-    Serverless = "Terraform"
+    bucket = local.bucket_name
   }
 
 }
+

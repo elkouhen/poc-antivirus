@@ -5,7 +5,7 @@ info:
 
 
 servers:
-  - url: "https://{api_id}.execute-api.eu-west-3.amazonaws.com/live"
+  - url: "https://{api_id}.execute-api.eu-west-1.amazonaws.com/live"
     variables:
       api_id:
         default: api_id
@@ -30,22 +30,26 @@ paths:
                 $ref: "#/components/schemas/PresignedURL"
       security:
         - api_key: [ ]
+      x-amazon-apigateway-auth: 
+        type: api_key
       x-amazon-apigateway-request-validator: validate_request
       x-amazon-apigateway-integration:
         responses:
           default:
             statusCode: 201
-        uri: "arn:aws:apigateway:eu-west-3:lambda:path/2015-03-31/functions/${presignedurl_lambda_arn}/invocations"
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/${presignedurl_lambda_arn}/invocations"
         passthroughBehavior: when_no_match
         httpMethod: POST
         type: aws_proxy
+
+
 
 components:
   schemas:
     PresignedURL:
       type: object
       properties:
-        language:
+        id:
           type: string
 
 securityDefinitions:

@@ -5,6 +5,11 @@ locals {
   image_uri             = "629923658207.dkr.ecr.eu-west-1.amazonaws.com/clamav:1.1"
 }
 
+provider "aws" {
+  
+  region  = "eu-west-1" 
+}
+
 resource "aws_kms_key" "clamav_bucket_key" {
   description             = "clamav_bucket_key"
   deletion_window_in_days = 10
@@ -77,7 +82,7 @@ module "clamav_lambda" {
   }
 
   environment_variables = {
-    Serverless = "Terraform"
+    
   }
 
 }
