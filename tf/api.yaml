@@ -28,10 +28,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PresignedURL"
-      security:
-        - api_key: [ ]
-      x-amazon-apigateway-auth: 
-        type: api_key
       x-amazon-apigateway-request-validator: validate_request
       x-amazon-apigateway-integration:
         responses:
@@ -51,12 +47,6 @@ components:
       properties:
         id:
           type: string
-
-securityDefinitions:
-  api_key:
-    type: apiKey
-    name: x-api-key
-    in: header
 
 x-amazon-apigateway-request-validators:
   validate_request:

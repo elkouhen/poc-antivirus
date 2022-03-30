@@ -5,7 +5,6 @@ resource "aws_api_gateway_rest_api" "api" {
   })
 
   name           = "presigned url"
-  api_key_source = "HEADER"
 
   endpoint_configuration {
     types = ["REGIONAL"]
@@ -29,25 +28,6 @@ resource "aws_api_gateway_stage" "live" {
   rest_api_id   = aws_api_gateway_rest_api.api.id
   stage_name    = "live"
 
-}
-
-resource "aws_api_gateway_usage_plan" "api_usageplan" {
-  name = "api_usageplan"
-
-  api_stages {
-    api_id = aws_api_gateway_rest_api.api.id
-    stage  = aws_api_gateway_stage.live.stage_name
-  }
-}
-
-resource "aws_api_gateway_api_key" "api_key" {
-  name = "my_key"
-}
-
-resource "aws_api_gateway_usage_plan_key" "main" {
-  key_id        = aws_api_gateway_api_key.api_key.id
-  key_type      = "API_KEY"
-  usage_plan_id = aws_api_gateway_usage_plan.api_usageplan.id
 }
 
 module "presignedurl_lambda" {
