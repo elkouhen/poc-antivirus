@@ -1,17 +1,33 @@
 import boto3
 import os 
+import json
+from botocore.client import Config
+    
+def create_presigned_post(bucket_name, object_name,
+                          fields=None, conditions=None, expiration=3600):
 
-def create_presigned_url(bucket_name, object_name, expiration=600):
-    s3 = boto3.client('s3',region_name="eu-west-1",config=boto3.session.Config(signature_version='s3v4',s3={'addressing_style': 'path'}))
-    
-    return s3.generate_presigned_url(ClientMethod='get_object',Params={'Bucket': bucket_name,'Key': object_name},ExpiresIn=expiration)
-    
+    # Generate a presigned S3 POST URL
+    s3_client = boto3.client('s3', config=boto3.session.Config(signature_version = 's3v4'))
+    try:
+        response = s3_client.generate_presigned_post(bucket_name,
+                                                     object_name,
+                                                     Fields=fields,
+                                                     Conditions=conditions,
+                                                     ExpiresIn=expiration)
+    except ClientError as e:
+        logging.error(e)
+        return None
+
+    # The response contains the presigned URL and required fields
+    return response
 
 def presigned(event, context): 
     
-    presigned_url = create_presigned_url(bucket_name=os.environ['bucket'], object_name="toto") 
+    presigned_url = create_presigned_post(bucket_name=os.environ['bucket'], object_name="toto") 
+
+    print (presigned_url)
 
     return {
         'statusCode': 200,        
-        'body': presigned_url
+        'body': json.dumps(presigned_url)
     }

@@ -1,5 +1,6 @@
 import requests
 import logging
+import json 
 
 from aws_requests_auth.boto_utils import BotoAWSRequestsAuth
 
@@ -17,4 +18,13 @@ auth = BotoAWSRequestsAuth(aws_host='i536xj8kxk.execute-api.eu-west-1.amazonaws.
 
 upload_request = requests.post(f"{api_base_url}/presigned-url", json={}, auth=auth)    
 
-print (upload_request.text)
+presigned_response = json.loads(upload_request.text)
+
+
+files = {'file': open('./requirements.txt' ,'r')}
+presigned_upload = requests.post(presigned_response['url'], data=presigned_response['fields'], files=files)    
+
+print(presigned_upload.request.url)
+print(presigned_upload.request.body)
+
+print(presigned_upload.text)
