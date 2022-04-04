@@ -2,12 +2,14 @@ import boto3
 import os 
 import json
 from botocore.client import Config
+import uuid
     
+s3_client = boto3.client('s3', config=boto3.session.Config(signature_version = 's3v4'))
+
 def create_presigned_post(bucket_name, object_name,
                           fields=None, conditions=None, expiration=3600):
 
-    # Generate a presigned S3 POST URL
-    s3_client = boto3.client('s3', config=boto3.session.Config(signature_version = 's3v4'))
+    # Generate a presigned S3 POST URL    
     try:
         response = s3_client.generate_presigned_post(bucket_name,
                                                      object_name,
@@ -23,9 +25,10 @@ def create_presigned_post(bucket_name, object_name,
 
 def presigned(event, context): 
     
-    presigned_url = create_presigned_post(bucket_name=os.environ['bucket'], object_name="toto") 
+    print (context)
+    print (event)
 
-    print (presigned_url)
+    presigned_url = create_presigned_post(bucket_name=os.environ['bucket'], object_name=str(uuid.uuid1()))     
 
     return {
         'statusCode': 200,        

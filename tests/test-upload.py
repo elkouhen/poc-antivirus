@@ -2,6 +2,12 @@ import requests
 import logging
 import json 
 
+import base64
+client_id = os.environ["CLIENT_ID"]
+client_secret = os.environ["CLIENT_SECRET"]
+base64.b64encode(f"{client_id}:{client_secret}".encode())
+
+
 from aws_requests_auth.boto_utils import BotoAWSRequestsAuth
 
 
@@ -24,7 +30,5 @@ presigned_response = json.loads(upload_request.text)
 files = {'file': open('./requirements.txt' ,'r')}
 presigned_upload = requests.post(presigned_response['url'], data=presigned_response['fields'], files=files)    
 
-print(presigned_upload.request.url)
-print(presigned_upload.request.body)
 
-print(presigned_upload.text)
+print(presigned_response['fields']['key'])

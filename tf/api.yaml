@@ -45,7 +45,7 @@ components:
     PresignedURL:
       type: object
       properties:
-        id:
+        key:
           type: string
 
 x-amazon-apigateway-request-validators:
