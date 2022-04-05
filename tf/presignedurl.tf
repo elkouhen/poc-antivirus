@@ -13,7 +13,7 @@ module "presignedurl_lambda" {
 
 
   attach_policy_statements = true
-   policy_statements = {
+  policy_statements = {
     kms_rw = {
       effect    = "Allow",
       actions   = ["kms:*"],
@@ -40,14 +40,22 @@ module "presignedurl_lambda" {
 }
 
 resource "aws_dynamodb_table" "presignedurl_table" {
-  name           = "presignedurl_table"
-  billing_mode   = "PAY_PER_REQUEST"
+  name         = "presignedurl_table"
+  billing_mode = "PAY_PER_REQUEST"
 
-  hash_key       = "user_id"
+  hash_key = "user_id"
 
   attribute {
     name = "user_id"
     type = "S"
   }
 
+}
+
+resource "aws_api_gateway_authorizer" "cognito" {
+  name        = "cognito-x"
+  rest_api_id = aws_api_gateway_rest_api.api.id
+  type        = "COGNITO_USER_POOLS"
+
+  provider_arns = [module.cognito-user-pool.arn]
 }
