@@ -2,7 +2,7 @@ module "cognito-user-pool" {
   source  = "lgallard/cognito-user-pool/aws"
   version = "0.15.2"
   # insert the 27 required variables here
-  user_pool_name             = "simple_extended_pool"
+  user_pool_name             = "poc-antivirus-pool"
   alias_attributes           = ["email", "phone_number"]
   auto_verified_attributes   = ["email"]
   sms_authentication_message = "Your username is {username} and temporary password is {####}."
@@ -43,7 +43,7 @@ module "cognito-user-pool" {
   domain = "poc-antivirus"
 
   # client
-  client_name                                 = "client0"
+  client_name                                 = "poc-antivirus-client"
   client_allowed_oauth_flows_user_pool_client = true
   client_supported_identity_providers         = ["COGNITO"]
   # identity_providers         = [ "Cognito User Pool" ]
@@ -57,8 +57,8 @@ module "cognito-user-pool" {
   client_generate_secret = false
 
   # user_group
-  user_group_name        = "mygroup"
-  user_group_description = "My group"
+  user_group_name        = "group1"
+  user_group_description = "group 1"
 
   # ressource server
   #resource_server_identifier        = "https://mydomain.com"

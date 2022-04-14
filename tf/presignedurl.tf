@@ -52,10 +52,10 @@ resource "aws_dynamodb_table" "presignedurl_table" {
 
 }
 
-resource "aws_api_gateway_authorizer" "cognito" {
-  name        = "cognito-x"
-  rest_api_id = aws_api_gateway_rest_api.api.id
-  type        = "COGNITO_USER_POOLS"
+#resource "aws_api_gateway_authorizer" "cognito" {
+#  name        = "cognito"
+#  rest_api_id = aws_api_gateway_rest_api.api.id
+#  type        = "COGNITO_USER_POOLS"
 
-  provider_arns = [module.cognito-user-pool.arn]
-}
+#  provider_arns = [module.cognito-user-pool.arn]
+#}
